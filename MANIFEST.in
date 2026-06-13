@@ -1,4 +1,0 @@
-include LICENSE
-include HISTORY.md
-include Dockerfile
-graft tests

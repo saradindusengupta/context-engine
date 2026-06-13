@@ -1,7 +1,0 @@
-# Requirements for production use
-pandas
-numpy
-scikit-learn
-scipy
-openpyxl
-graphiti-core

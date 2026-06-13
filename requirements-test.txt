@@ -1,4 +1,0 @@
-# This requirements are for development and testing/development only, not for production.
-pytest
-pytest-cov
-gitchangelog
