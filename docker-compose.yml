@@ -1,0 +1,22 @@
+services:
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j
+    ports:
+      - "7474:7474"   # HTTP browser
+      - "7687:7687"   # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/workshop123
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      # cypher-shell ships in the image; proves Bolt + auth are actually ready
+      # (HTTP-up != Bolt-ready, the #1 "connection refused" cause).
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p workshop123 'RETURN 1' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  neo4j_data:

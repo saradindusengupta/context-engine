@@ -141,8 +141,11 @@ dmypy.json
 .env.production.local
 .env.development.local
 
-# Data
-data/
+# Data — ignore the generated SQLite store, but keep the sample inputs tracked
+# (data/*.jsonl, data/*.md and tests/data/ are the demo + CI fixtures and must ship).
+data/context.db
+data/context.db-wal
+data/context.db-shm
 neo4j_data/
 neo4j_logs/
 neo4j_import/

@@ -1,0 +1,29 @@
+[project]
+name = "context-engine"
+version = "0.1.0"
+description = "A Context Engine over MCP — workshop demo (graph of services/deploys/incidents/decisions/facts)"
+authors = [{ name = "Saradindu Sengupta" }]
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.2",
+    "neo4j>=5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "black>=24.0", "flake8>=7.0"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# Flat scripts under src/, not an installable package; don't auto-discover.
+py-modules = []
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]

@@ -1,0 +1,2 @@
+{"id":"dep-1190","sha":"9f3c01a","service":"payments-api","at":"2026-05-30T14:10:00Z","by":"okafor"}
+{"id":"dep-1191","sha":"a1b2c3d","service":"payments-api","at":"2026-06-12T09:02:00Z","by":"rao","change":"timeout 5s -> 30s"}
