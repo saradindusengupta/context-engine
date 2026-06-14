@@ -103,6 +103,28 @@ cp claude_desktop_config.json ~/Library/Application\ Support/Claude/claude_deskt
 Quit and reopen Claude Desktop so it loads the MCP server, then confirm the `context-engine`
 tools appear (hammer/tools icon).
 
+**Or connect Claude Code (CLI).** The repo ships a project-scoped [`.mcp.json`](../.mcp.json) that
+points Claude Code at the same server — nothing to edit. Start Claude Code from the repo root and
+approve the server the first time (project-scoped servers need a one-time OK):
+
+```bash
+cd /Users/saradindusengupta/dev/context-engine
+claude            # approve "context-engine" when prompted
+```
+
+Verify:
+
+```bash
+claude mcp list                 # context-engine … ✓ Connected
+claude mcp get context-engine   # shows the stdio command + env
+```
+
+Inside the session, `/mcp` lists `context-engine` with its 5 tools; then run the same script below.
+(Slow first start? `MCP_TIMEOUT=60000 claude`. Re-prompt for approval: `claude mcp
+reset-project-choices`. Remove it: `claude mcp remove context-engine`. To use the **SQLite** backend
+instead, edit [`.mcp.json`](../.mcp.json) — set `STORE_BACKEND=sqlite` + `SQLITE_PATH` in `env` and
+drop the `NEO4J_*` keys.)
+
 **The script (the money moment):**
 
 1. *Read state:* ask **"Why is `payments-api` degraded right now?"** → it calls
@@ -111,8 +133,9 @@ tools appear (hammer/tools icon).
    `find_precedent` → returns dec-3300 (forward-fix, owner-approved, 40 min).
 3. *Decide + write:* ask **"Given POL-ROLLBACK-1 and that precedent, propose an action and
    record it."** → it calls `record_decision(incident_id="INC-4827", action="forward-fix", rationale="…", made_by="rao", policy_id="POL-ROLLBACK-1", exception=true, precedent_id="dec-3300")`.
-4. **Persistence proof — Checkpoint 3:** **quit Claude Desktop, reopen it** (fresh session,
-   empty chat), then ask **"What did we decide about INC-4827, and why?"** → a brand-new agent
+4. **Persistence proof — Checkpoint 3:** start a **fresh session** (quit & reopen Claude Desktop,
+   or exit `claude` and relaunch it) — empty chat history — then ask **"What did we decide about
+   INC-4827, and why?"** → a brand-new agent
    calls `find_precedent`/`get_event_timeline`, reads the decision **it never saw written**,
    and explains it, citing the policy and precedent.
 

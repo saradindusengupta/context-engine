@@ -22,6 +22,11 @@ uv run python src/ingest.py          # expect: ingested
 npx @modelcontextprotocol/inspector uv run python src/server.py   # explore the 5 tools
 ```
 
+**Drive it from an agent:** the repo ships a project-scoped [.mcp.json](.mcp.json), so **Claude
+Code** auto-discovers the server — run `claude` in the repo, approve `context-engine` on first use,
+then `/mcp` to confirm. Claude Desktop / MCP Inspector configs live in
+[claude_desktop_config.json](claude_desktop_config.json).
+
 **No Docker?** The same demo runs on a stdlib-only SQLite backend:
 
 ```bash
