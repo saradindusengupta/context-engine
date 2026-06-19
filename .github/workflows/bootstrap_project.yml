@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Rename directory
         run: |
@@ -49,7 +49,7 @@ jobs:
     needs: rename_directory # Ensures it runs after rename is pushed
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3 # Checks out the repo with the renamed directory
+        uses: actions/checkout@v6 # Checks out the repo with the renamed directory
 
       - name: Update README title
         run: |
@@ -73,7 +73,7 @@ jobs:
     needs: rename_directory # Can run after rename, in parallel with update_readme
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3 # Checks out the repo with the renamed directory
+        uses: actions/checkout@v6 # Checks out the repo with the renamed directory
 
       - name: Create CODEOWNERS file
         run: |
