@@ -146,6 +146,10 @@ dmypy.json
 data/context.db
 data/context.db-wal
 data/context.db-shm
+# Mira memory demo — generated SQLite store (any location)
+mira.db
+mira.db-wal
+mira.db-shm
 neo4j_data/
 neo4j_logs/
 neo4j_import/
