@@ -65,13 +65,38 @@ One env var, zero new dependencies. Both backends implement the same semantic st
 
 Timestamps are stored as ISO-8601 Zulu strings in both, so ordering and tool output are identical.
 
+## Companion demo: a multi-session memory agent (`src/memory/`)
+
+A second, self-contained demo — the smallest agent with *real* **memory**. Three tiers (live
+buffer + rolling summary, a temporal user model, semantic episodes) with disciplined movement
+between them: **compress** on the way in, retrieve a **scoped** slice on the way out, persisted in
+SQLite so it survives a **process restart**. `src/memory/memory.py` is the only backend-specific
+file. Full presenter script: [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md).
+
+```bash
+uv run python src/memory/demo.py     # session 1 → restart → session 2 (deterministic, no keys)
+uv run python src/memory/reset.py    # wipe mira.db
+uv run python src/memory/seed.py     # seed session 1 only, to jump to the restart beat
+```
+
+Offline (no keys) is deterministic: a chat stand-in surfaces the assembled memory, a toy embedder
+hashes a 256-dim vector. Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` for real chat / embeddings
+(each falls back independently).
+
+**Drive it from an agent:** [src/memory/mcp_server.py](src/memory/mcp_server.py) exposes the durable
+tiers as the **`mira-memory`** MCP server (also in [.mcp.json](.mcp.json)) — `memory_recall`,
+`memory_facts`, `memory_remember`, `memory_upsert_fact`, `forget_user`. Restart Claude Code to pick
+it up; memory persists across restarts in `mira.db` (gitignored). See §15 of the plan for the
+on-stage flow and trade-offs.
+
 ## Project layout
 
 ```text
 ├── src/
 │   ├── store.py          # Neo4jStore + SqliteStore behind one semantic API (STORE_BACKEND selects)
 │   ├── ingest.py         # load data/ into the graph (idempotent upserts)
-│   └── server.py         # FastMCP server: the 5 tools over stdio
+│   ├── server.py         # FastMCP server: the 5 tools over stdio
+│   └── memory/           # companion demo: multi-session memory agent + mira-memory MCP server
 ├── schema/schema.cypher  # Neo4j constraints + index (SQLite builds its tables in code)
 ├── data/                 # sample inputs: deploys.jsonl, incident-4827.md, rollback-policy.md
 ├── scripts/

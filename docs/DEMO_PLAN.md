@@ -41,7 +41,6 @@ Companion to the AiT 2026 Workshop Plan. This is the presenter's build script: t
 
 ```
 src/memory/
-├── README.md            # one-paragraph setup + how to run the script
 ├── requirements.txt     # numpy ; anthropic (optional) ; openai (optional)
 ├── config.py            # budget, top_k, model names, capability flags
 ├── llm.py               # chat() + embed(), with per-capability offline fallback
