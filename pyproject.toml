@@ -5,6 +5,7 @@ description = "A Context Engine over MCP — workshop demo (graph of services/de
 authors = [{ name = "Saradindu Sengupta" }]
 requires-python = ">=3.10"
 dependencies = [
+    "anthropic>=0.112.0",
     "mcp[cli]>=1.2",
     "neo4j>=5.0",
     "numpy>=2.2.6",

@@ -190,6 +190,86 @@ docker compose down -v     # also drop the volume (fully clean)
 
 ---
 
+## 8. Mira memory demo (the second MCP server)
+
+A companion demo: **Mira**, a multi-session memory agent with three tiers —
+live buffer + rolling summary (tier 1), user facts (tier 2), semantic episodes
+(tier 3) — persisted in SQLite so memory survives a process restart. Code is
+under [`src/memory/`](../src/memory/); `memory.py` is the only backend-specific
+file. Full beat-by-beat script and talking points live in the companion
+`DEMO_PLAN.md` (repo parent directory).
+
+### Environment
+
+The `uv sync` from §0 already installs the one hard dependency (`numpy`). With
+no API keys the demo runs **fully offline and deterministic** — the stage
+default. Real chat/embeddings are optional and independent per capability:
+
+```bash
+uv add anthropic openai          # only if you want live LLM calls
+export ANTHROPIC_API_KEY=...     # real chat; omit for the deterministic stand-in
+export OPENAI_API_KEY=...        # real OpenAI embeddings; omit for the toy 256-dim embedder
+```
+
+A single run takes one branch per capability, so stored vectors never mix
+dimensions. If you change keys mid-session, wipe the store first (below).
+
+### Run A — standalone scripted demo
+
+The scripts use flat imports, so run them **from `src/memory/`**:
+
+```bash
+cd src/memory
+uv run python reset.py && uv run python demo.py
+```
+
+This plays session 1 (tier writes → compaction → contradiction), restarts the
+agent with an empty buffer, and answers from memory alone. To jump straight to
+the restart beat: `uv run python seed.py`, then
+`uv run python -c 'import demo; demo.session_two_after_restart()'`.
+
+Checkpoints: 3 canonical facts after session 1; a `SUMMARY SO FAR:` block once
+the buffer crosses `TOKEN_BUDGET` (the script prints the turn that tripped it);
+`deadline=Monday` canonical with `Friday` superseded; the post-restart answer
+names **Monday** + **short and direct** with an empty buffer.
+
+### Run B — inside Claude Code (MCP)
+
+The repo's [`.mcp.json`](../.mcp.json) ships a second server, `mira-memory`,
+alongside `context-engine` — nothing to edit. Start Claude Code from the repo
+root and approve it on first use. Five tools: `memory_remember`,
+`memory_recall`, `memory_facts`, `memory_upsert_fact`, `forget_user`.
+
+The beats (talk; let Claude call the tools):
+
+1. *Teach durable facts* — "I'm preparing for a databases exam. I prefer short,
+   direct answers. My deadline is Friday." → `memory_remember` ×3.
+2. *Show the user model* — "what do you remember about me?" → `memory_facts`.
+3. *Contradict* — "actually, the deadline moved to Monday." → `memory_remember`
+   supersedes Friday; Monday becomes canonical (current truth is a query, not the
+   latest write).
+4. **Persistence proof — the money moment:** quit Claude Code, reopen it (fresh
+   process, empty window), ask "what's my deadline and how do I like answers?" →
+   `memory_recall` answers Monday + short-and-direct with no chat history.
+
+*Talking point:* "No chat history. It remembered because the memory lives in the
+MCP-backed store, not the window."
+
+### Reset / wipe
+
+The store persists by design — that's the whole point — so start a fresh
+rehearsal deliberately. **The two run paths use separate databases:**
+
+| Path | Store file | Wipe with |
+| ---- | ---------- | --------- |
+| Standalone `demo.py` | `src/memory/mira.db` | `cd src/memory && uv run python reset.py` |
+| Claude Code (MCP) | repo-root `mira.db` | `rm mira.db`, or tell Claude "forget `<user_id>`" |
+
+Both are gitignored. In a live session you can also just use a fresh `user_id`
+per rehearsal instead of wiping.
+
+---
+
 ## Reference
 
 - **Backends:** `STORE_BACKEND` = `neo4j` (default) or `sqlite`. Neo4j creds default to
