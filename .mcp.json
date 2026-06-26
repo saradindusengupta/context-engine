@@ -9,6 +9,14 @@
         "NEO4J_USER": "neo4j",
         "NEO4J_PASS": "workshop123"
       }
+    },
+    "mira-memory": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "--directory", "${CLAUDE_PROJECT_DIR:-.}", "python", "src/memory/mcp_server.py"],
+      "env": {
+        "DB_PATH": "mira.db"
+      }
     }
   }
 }
