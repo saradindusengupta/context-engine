@@ -159,3 +159,6 @@ neo4j_plugins/
 
 # Bevel
 .bevel/
+
+# MacOS
+.DS_Store
